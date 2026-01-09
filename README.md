@@ -177,6 +177,12 @@ This ensures:
 ✔ DAG validity
 ✔ Early error detection
 
+# Troubleshooting
+If DAG is not visable  we need to restart Airflow
+If COPY Fails we need to chekc Check IAM role + S3 path
+If RedShift connection fails we need to Verify endpoint + port
+If PoerBi having any issues we need to check and Confirm schema + permissions
+
 # Cleanup
 
 To destroy AWS resources:
