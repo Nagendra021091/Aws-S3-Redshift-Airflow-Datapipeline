@@ -38,7 +38,6 @@ GitHub Push / PR
 ├─ sql/                   # Schemas, DDL, quality checks
 ├─ powerbi/               # PBIP project
 ├─ data/sample/           # Sample CSV data
-├─ docs/                  # Screenshots & evidence
 └─ .github/workflows/     # CI/CD pipeline
 
 # Infrastructure Setup (Terraform)
@@ -78,7 +77,116 @@ Pass:
 # Upload Sample Data to S3
 
 aws s3 cp data/sample/sales_orders.csv \
-s3:///raw/sales_orders/sales_orders_test.csv
+s3://raw_bucket/raw/sales_orders/sales_orders_test.csv
+
+This places the raw CSV in S3 for ingestion.
+
+# Run the Pipeline
+
+Open Airflow UI
+Trigger DAG: s3_to_redshift_pipeline
+Monitor logs
+
+Airflow loads data into staging tables, runs quality checks, and promotes clean data to curated table
+
+# Data Quality Checks
+
+The pipeline validates:
+
+Null values
+Duplicates
+Schema consistency
+
+Example:
+
+SELECT COUNT(*) 
+FROM staging.sales_orders 
+WHERE order_id IS NULL;
+
+Expected Result: 0
+
+If checks fail:
+
+❌ Curated tables are NOT updated
+✔ Previous curated data remains available
+
+# Rollback & Failure Handling
+Strategy
+
+Data loads into staging tables
+Quality checks are executed
+Only clean data is promoted to curated tables
+
+If any step fails:
+
+Pipeline stops
+Curated tables remain unchanged
+Dashboards continue using old data
+Pipeline can be safely re-run
+
+# Idempotent Loads
+
+TRUNCATE TABLE staging.sales_orders;
+COPY staging.sales_orders FROM S3;
+
+This ensures:
+
+No duplicates
+No partial data
+Safe retries
+
+# Logging & Observability
+
+Airflow provides:
+
+Task-level logs
+Error traces
+Execution history
+
+# Power BI (PBIP)
+Setup
+
+Connect to Redshift curated schema
+Save project as PBIP for version control
+
+Measures
+Total Sales = SUM(sales_summary[total_sales])
+Total Orders = SUM(sales_summary[total_orders])
+Avg Order Value = DIVIDE([Total Sales], [Total Orders])
+
+# Report
+
+Includes:
+
+Sales trend line chart
+KPI cards
+Summary table
+
+# CI/CD Pipeline (GitHub Actions)
+
+On every push / pull request, the pipeline runs:
+
+Python linting
+DAG import tests
+Unit tests
+
+Pipeline file: .github/workflows/ci.yml
+
+This ensures:
+
+✔ Code quality
+✔ DAG validity
+✔ Early error detection
+
+# Cleanup
+
+To destroy AWS resources:
+
+cd infra/terraform
+terraform destroy -auto-approve
+
+
+
 
 
 
