@@ -5,7 +5,7 @@ import psycopg2
 
 def load_to_redshift():
     conn = psycopg2.connect(
-        host="your-redshift-endpoint",
+        host="our-redshift-endpoint",
         dbname="devdb",
         user="admin",
         password="password",
@@ -15,7 +15,7 @@ def load_to_redshift():
 
     cur.execute("""
         COPY staging.sales_orders
-        FROM 's3://your-bucket/raw/sales_orders/'
+        FROM 's3://raw_bucket/raw/sales_orders/'
         IAM_ROLE 'your-role-arn'
         CSV IGNOREHEADER 1;
     """)
