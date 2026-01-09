@@ -4,6 +4,7 @@ from datetime import datetime
 import psycopg2
 import os
 
+
 def load_to_redshift():
     print("Connecting to Redshift...")
 
@@ -36,6 +37,7 @@ def load_to_redshift():
     finally:
         cur.close()
         conn.close()
+
 
 with DAG(
     dag_id="s3_to_redshift_pipeline",
