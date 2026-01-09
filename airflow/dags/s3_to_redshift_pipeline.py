@@ -26,7 +26,7 @@ def load_to_redshift():
 
 with DAG(
     dag_id="s3_to_redshift_pipeline",
-    start_date=datetime(2024, 1, 1),
+    start_date=datetime(2026, 1, 1),
     schedule_interval=None,
     catchup=False
 ) as dag:
