@@ -1,7 +1,11 @@
 from airflow import DAG
 from airflow.providers.standard.operators.python import PythonOperator
 from datetime import datetime
-import psycopg2
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
+
 import os
 
 
