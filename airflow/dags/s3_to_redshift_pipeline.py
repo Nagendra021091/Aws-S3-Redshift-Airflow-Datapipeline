@@ -2,27 +2,40 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 import psycopg2
+import os
 
 def load_to_redshift():
+    print("Connecting to Redshift...")
+
     conn = psycopg2.connect(
-        host="our-redshift-endpoint",
-        dbname="devdb",
-        user="admin",
-        password="password",
+        host=os.environ.get("REDSHIFT_HOST"),
+        dbname=os.environ.get("REDSHIFT_DB"),
+        user=os.environ.get("REDSHIFT_USER"),
+        password=os.environ.get("REDSHIFT_PASSWORD"),
         port=5439
     )
+
     cur = conn.cursor()
 
-    cur.execute("""
-        COPY staging.sales_orders
-        FROM 's3://raw_bucket/raw/sales_orders/'
-        IAM_ROLE 'your-role-arn'
-        CSV IGNOREHEADER 1;
-    """)
+    print("Running COPY command...")
 
-    conn.commit()
-    cur.close()
-    conn.close()
+    copy_sql = f"""
+        COPY staging.sales_orders
+        FROM 's3://{os.environ.get("S3_BUCKET")}/raw/sales_orders/'
+        IAM_ROLE '{os.environ.get("REDSHIFT_ROLE_ARN")}'
+        CSV IGNOREHEADER 1;
+    """
+
+    try:
+        cur.execute(copy_sql)
+        conn.commit()
+        print("Data load completed successfully.")
+    except Exception as e:
+        print("Error loading data:", e)
+        raise
+    finally:
+        cur.close()
+        conn.close()
 
 with DAG(
     dag_id="s3_to_redshift_pipeline",
