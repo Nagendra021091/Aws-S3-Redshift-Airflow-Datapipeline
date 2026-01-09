@@ -17,8 +17,7 @@ CSV → S3 (Raw)
  Redshift Serverless
    ├─ Staging (Raw, untrusted)
    └─ Curated (Validated, trusted)
-        |
-        
+        |  
      Power BI (PBIP)
      
 # CI/CD Flow
