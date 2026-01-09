@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.providers.standard.operators.python import PythonOperator
 from datetime import datetime
+
 try:
     import psycopg2
 except ImportError:
@@ -10,6 +11,9 @@ import os
 
 
 def load_to_redshift():
+    if psycopg2 is None:
+        raise RuntimeError("psycopg2 is not installed")
+
     print("Connecting to Redshift...")
 
     conn = psycopg2.connect(
@@ -46,7 +50,7 @@ def load_to_redshift():
 with DAG(
     dag_id="s3_to_redshift_pipeline",
     start_date=datetime(2026, 1, 1),
-    schedule_interval=None,
+    schedule=None,
     catchup=False
 ) as dag:
 
