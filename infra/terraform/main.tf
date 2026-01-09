@@ -6,18 +6,25 @@ resource "aws_s3_bucket" "raw_bucket" {
   bucket = "${var.project}-raw-data"
 }
 
-resource "aws_iam_role" "redshift_role" {
-  name = "${var.project}-redshift-role"
+resource "aws_iam_role_policy" "redshift_s3_policy" {
+  role = aws_iam_role.redshift_role.id
 
-  assume_role_policy = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
-      Principal = { Service = "redshift.amazonaws.com" }
-      Action = "sts:AssumeRole"
+      Action = [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ]
+      Resource = [
+        aws_s3_bucket.raw_bucket.arn,
+        "${aws_s3_bucket.raw_bucket.arn}/*"
+      ]
     }]
   })
 }
+
 
 resource "aws_redshiftserverless_namespace" "ns" {
   namespace_name = "${var.project}-ns"
