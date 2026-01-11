@@ -12,9 +12,9 @@ resource "aws_iam_role" "redshift_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
+      Effect    = "Allow"
       Principal = { Service = "redshift.amazonaws.com" }
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -35,13 +35,13 @@ resource "aws_iam_role_policy" "redshift_s3_policy" {
   })
 }
 
-resource "aws_redshiftserverless_namespace" "ns" {
-  namespace_name = "${var.project}-ns"
-  db_name        = "devdb"
-  iam_roles      = [aws_iam_role.redshift_role.arn]
-}
-
-resource "aws_redshiftserverless_workgroup" "wg" {
-  workgroup_name = "${var.project}-wg"
-  namespace_name = aws_redshiftserverless_namespace.ns.namespace_name
+resource "aws_redshift_cluster" "redshift_cluster" {
+  cluster_identifier  = "${var.project}-cluster"
+  database_name       = "devdb"
+  master_username     = "admin"
+  master_password     = var.redshift_password
+  node_type           = "dc2.large"
+  cluster_type        = "single-node"
+  iam_roles           = [aws_iam_role.redshift_role.arn]
+  skip_final_snapshot = true
 }
