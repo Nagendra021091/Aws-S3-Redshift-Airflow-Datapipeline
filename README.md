@@ -49,7 +49,7 @@ GitHub Push / PR
 
 cd infra/terraform
 terraform init
-terraform apply -var="project=pre-assessment" -var="region=eu-west-2"
+terraform apply -var="project=pre-assessment" -var="region=us-east-1"
 
 # Outputs
 
