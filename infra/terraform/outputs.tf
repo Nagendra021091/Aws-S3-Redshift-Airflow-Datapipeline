@@ -6,10 +6,10 @@ output "redshift_role_arn" {
   value = aws_iam_role.redshift_role.arn
 }
 
-output "redshift_workgroup" {
-  value = aws_redshiftserverless_workgroup.wg.workgroup_name
+output "redshift_cluster_endpoint" {
+  value = aws_redshift_cluster.redshift_cluster.endpoint
 }
 
-output "redshift_namespace" {
-  value = aws_redshiftserverless_namespace.ns.namespace_name
+output "redshift_cluster_id" {
+  value = aws_redshift_cluster.redshift_cluster.id
 }
