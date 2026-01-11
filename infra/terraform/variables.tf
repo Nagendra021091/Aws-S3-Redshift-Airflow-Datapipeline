@@ -5,3 +5,9 @@ variable "project" {
 variable "region" {
   description = "AWS region for deployment"
 }
+
+variable "redshift_password" {
+  description = "Master password for Redshift cluster"
+  type        = string
+  sensitive   = true
+}
